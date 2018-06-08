@@ -11,19 +11,24 @@ import os
 ROOT_DIR = os.path.abspath('../')
 DATA_DIR = os.path.join(ROOT_DIR, 'DATASET/')
 OUT_DIR = os.path.join(ROOT_DIR, 'RESULT/')
+MODEL_DIR = os.path.join(ROOT_DIR, 'MODEL/')
 
-FILENAME = "train_iris.csv"
+TRAIN_FILENAME = "train_iris.csv"
+TEST_FILENAME = "test_iris.csv"
 
 # DATA INFORMATION
-NUM_FEATURES = 3
+NUM_FEATURES = 4
 NUM_CLASS = 3
-BATCH_SIZE = 9
+BATCH_SIZE = 20
 
 # MODEL INFORMATION
-HIDDEN_LAYERS = 1
-SHAPE = [(NUM_FEATURES, 3),
-         (3, NUM_CLASS)]
-
+HIDDEN_LAYERS = 2
+SHAPE = [(NUM_FEATURES, 8),
+         (8, 4),
+         (4, NUM_CLASS)]
 
 # RANDOM NUMBER GENERATOR INFORMATION
 SEED = 128
+
+# TRAINING INFORMATION
+NUM_EPOCHS = 5000
