@@ -6,10 +6,9 @@ Created on Thu Feb  8 20:24:33 2018
 """
 
 import data
-import config
 
 data = data.DATA()
-data.read(config.TRAIN_FILENAME)
+data.read()
 ax, ay = data.generate_batch()
 bx, by = data.generate_batch()
 cx, cy = data.generate_batch()

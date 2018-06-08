@@ -37,6 +37,14 @@ class MODEL():
         self.output = out_layer.feed_forward(h_output)
         self.loss = tf.reduce_mean(-tf.reduce_sum(self.labels * tf.log(self.output), axis=0))
 
+#    def build(self):
+#        input_data = self.inputs
+#        hidden = neural_network.Hidden_Layer((config.NUM_FEATURES, 4))
+#        hidden_output = hidden.feed_forward(input_data)
+#        out_layer = neural_network.Out_Layer((4, config.NUM_CLASS))
+#        self.output = out_layer.feed_forward(hidden_output)
+#        self.loss = tf.reduce_mean(-tf.reduce_sum(self.labels * tf.log(self.output), axis=0))
+
     def train(self, data):
         optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.001).minimize(self.loss)
         saver = tf.train.Saver()
