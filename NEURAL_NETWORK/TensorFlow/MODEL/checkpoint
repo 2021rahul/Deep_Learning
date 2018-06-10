@@ -1,0 +1,2 @@
+model_checkpoint_path: "/my_dir/work/TENSORFLOW_DL/NEURAL_NETWORK/TensorFlow/MODEL/model45_2000.ckpt"
+all_model_checkpoint_paths: "/my_dir/work/TENSORFLOW_DL/NEURAL_NETWORK/TensorFlow/MODEL/model45_2000.ckpt"

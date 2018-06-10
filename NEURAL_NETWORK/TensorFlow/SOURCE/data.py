@@ -24,8 +24,8 @@ class DATA():
         data = pd.read_csv(os.path.join(config.DATA_DIR, filename), header=None)
         data = np.asarray(data)
         self.size, self.num_features = data.shape
-        self.dataX = data[:,:-1]
-        self.dataY = self.dense_to_one_hot(data[:,-1])
+        self.dataX = data[:, :-1]
+        self.dataY = self.dense_to_one_hot(data[:, -1])
 
     def dense_to_one_hot(self, labels):
         labels_one_hot = pd.get_dummies(labels)

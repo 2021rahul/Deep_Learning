@@ -21,8 +21,6 @@ class MODEL():
         self.weights = None
         self.output = None
 
-
-
     def loss_function(self, Y, predict):
         return tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=Y, logits=predict))
 
@@ -36,14 +34,6 @@ class MODEL():
         out_layer = neural_network.Out_Layer(config.SHAPE[-1])
         self.output = out_layer.feed_forward(h_output)
         self.loss = tf.reduce_mean(-tf.reduce_sum(self.labels * tf.log(self.output), axis=0))
-
-#    def build(self):
-#        input_data = self.inputs
-#        hidden = neural_network.Hidden_Layer((config.NUM_FEATURES, 4))
-#        hidden_output = hidden.feed_forward(input_data)
-#        out_layer = neural_network.Out_Layer((4, config.NUM_CLASS))
-#        self.output = out_layer.feed_forward(hidden_output)
-#        self.loss = tf.reduce_mean(-tf.reduce_sum(self.labels * tf.log(self.output), axis=0))
 
     def train(self, data):
         optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.001).minimize(self.loss)
@@ -63,15 +53,14 @@ class MODEL():
                     avg_cost += loss_val / total_batch
                 print("Epoch:", (epoch + 1), "cost =", "{:.3f}".format(avg_cost))
 
-            save_path = saver.save(session, os.path.join(config.MODEL_DIR, "model.ckpt"))
+            save_path = saver.save(session, os.path.join(config.MODEL_DIR, "model" + str(config.BATCH_SIZE) + "_" + str(config.NUM_EPOCHS) + ".ckpt"))
             print("Model saved in path: %s" % save_path)
 
-
-    def test(self, dataX, dataY):
+    def test(self, data):
         with tf.Session() as session:
             saver = tf.train.Saver()
-            saver.restore(session, os.path.join(config.MODEL_DIR, "model.ckpt"))
-            for i in range(len(dataX)):
-                feed_dict = {self.inputs: [dataX[i]]}
+            saver.restore(session, os.path.join(config.MODEL_DIR, "model" + str(config.BATCH_SIZE) + "_" + str(config.NUM_EPOCHS) + ".ckpt"))
+            for i in range(len(data.dataX)):
+                feed_dict = {self.inputs: [data.dataX[i]]}
                 predicted = np.rint(session.run(self.output, feed_dict=feed_dict))
-                print('Actual:', dataY[i], 'Predicted:', predicted)
+                print('Actual:', data.dataY[i], 'Predicted:', predicted)
