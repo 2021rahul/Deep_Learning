@@ -36,16 +36,21 @@ class operators():
         self.optimizer = torch.optim.SGD(self.net.parameters(), lr=0.1)
 
     def train(self, data):
+        train_loader = torch.utils.data.DataLoader(dataset=data,
+                                                   batch_size=config.BATCH_SIZE, 
+                                                   shuffle=True)
         for epoch in range(config.NUM_EPOCHS):
-            X = Variable(torch.Tensor(data.dataX).float())
-            Y = Variable(torch.Tensor(data.dataY).long())
-            self.optimizer.zero_grad()
-            out = self.net(X)
-            loss = self.loss(out, Y)
-            loss.backward()
-            self.optimizer.step()
+            for i, [features, labels] in enumerate(train_loader):
+                print(i)
+                X = Variable(torch.Tensor(features).float())
+                Y = Variable(torch.Tensor(labels).long())
+                self.optimizer.zero_grad()
+                out = self.net.forward(X)
+                loss = self.loss(out, Y)
+                loss.backward()
+                self.optimizer.step()
             print("Epoch:", (epoch + 1), "loss =", "{:.3f}".format(loss.data[0]))
-            torch.save(self.net, os.path.join(config.MODEL_DIR, "model" + str(config.BATCH_SIZE) + "_" + str(config.NUM_EPOCHS) + ".pt"))
+        torch.save(self.net, os.path.join(config.MODEL_DIR, "model" + str(config.BATCH_SIZE) + "_" + str(config.NUM_EPOCHS) + ".pt"))
 
     def test(self, data):
         self.net = torch.load(os.path.join(config.MODEL_DIR, "model" + str(config.BATCH_SIZE) + "_" + str(config.NUM_EPOCHS) + ".pt"))
@@ -53,4 +58,4 @@ class operators():
         Y = Variable(torch.Tensor(data.dataY).long())
         out = self.net(X)
         _, predicted = torch.max(out.data, 1)
-        print('Accuracy of the network %d %%' % (100 * torch.sum(Y == predicted) / 60))
+        print('Accuracy of the network %d %%' % (100 * torch.sum(Y.data == predicted) / 60))
