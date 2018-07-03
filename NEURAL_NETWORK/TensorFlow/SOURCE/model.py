@@ -18,7 +18,6 @@ class MODEL():
         self.inputs = tf.placeholder(shape=[None, config.NUM_FEATURES], dtype=tf.float32)
         self.labels = tf.placeholder(shape=[None, config.NUM_CLASS], dtype=tf.float32)
         self.loss = None
-        self.weights = None
         self.output = None
 
     def loss_function(self, Y, predict):
@@ -57,8 +56,8 @@ class MODEL():
             print("Model saved in path: %s" % save_path)
 
     def test(self, data):
+        saver = tf.train.Saver()
         with tf.Session() as session:
-            saver = tf.train.Saver()
             saver.restore(session, os.path.join(config.MODEL_DIR, "model" + str(config.BATCH_SIZE) + "_" + str(config.NUM_EPOCHS) + ".ckpt"))
             for i in range(len(data.dataX)):
                 feed_dict = {self.inputs: [data.dataX[i]]}
