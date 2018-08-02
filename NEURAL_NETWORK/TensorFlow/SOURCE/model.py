@@ -15,8 +15,8 @@ import os
 class MODEL():
 
     def __init__(self):
-        self.inputs = tf.placeholder(shape=[None, config.NUM_FEATURES], dtype=tf.float32)
-        self.labels = tf.placeholder(shape=[None, config.NUM_CLASS], dtype=tf.float32)
+        self.inputs = tf.placeholder(name="inputs", shape=[None, config.NUM_FEATURES], dtype=tf.float32)
+        self.labels = tf.placeholder(name="labels", shape=[None, config.NUM_CLASS], dtype=tf.float32)
         self.loss = None
         self.output = None
 
@@ -37,6 +37,7 @@ class MODEL():
 
         with tf.name_scope("cost_function"):
             self.loss = tf.reduce_mean(-tf.reduce_sum(self.labels * tf.log(self.output), axis=0))
+        tf.summary.scalar('loss', self.loss)
 
     def train(self, data):
         with tf.name_scope("train"):
@@ -56,12 +57,10 @@ class MODEL():
                 for batch in range(total_batch):
                     batch_X, batch_Y = data.generate_batch()
                     feed_dict = {self.inputs: batch_X, self.labels: batch_Y}
-                    _, loss_val = session.run([optimizer, self.loss], feed_dict=feed_dict)
+                    summary_str, _, loss_val = session.run([merged_summary_op, optimizer, self.loss], feed_dict=feed_dict)
+                    summary_writer.add_summary(summary_str, str(epoch)+"_"+str(batch))
                     print("batch:", batch, " loss: ", loss_val)
                     avg_cost += loss_val / total_batch
-
-#                summary_str = session.run([merged_summary_op], feed_dict=feed_dict)
-#                summary_writer.add_summary(summary_str, epoch)
                 print("Epoch:", (epoch + 1), "cost =", "{:.3f}".format(avg_cost))
 
             summary_writer.close()
