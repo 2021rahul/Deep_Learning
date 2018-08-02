@@ -20,26 +20,35 @@ class MODEL():
         self.loss = None
         self.output = None
 
-    def loss_function(self, Y, predict):
-        return tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=Y, logits=predict))
-
     def build(self):
         input_data = self.inputs
-        for i in range(config.HIDDEN_LAYERS):
-            h = neural_network.Hidden_Layer(config.SHAPE[i])
-            h_output = h.feed_forward(input_data)
-            input_data = h_output
 
-        out_layer = neural_network.Out_Layer(config.SHAPE[-1])
-        self.output = out_layer.feed_forward(h_output)
-        self.loss = tf.reduce_mean(-tf.reduce_sum(self.labels * tf.log(self.output), axis=0))
+        with tf.name_scope("h1_layer"):
+            h1_layer = neural_network.Hidden_Layer(shape=(config.NUM_FEATURES, 8))
+            h = h1_layer.feed_forward(input_data)
+
+        with tf.name_scope("h2_layer"):
+            h2_layer = neural_network.Hidden_Layer(shape=(8, 4))
+            h = h2_layer.feed_forward(h)
+
+        with tf.name_scope("out_layer"):
+            out_layer = neural_network.Out_Layer(shape=(4, config.NUM_CLASS))
+            self.output = out_layer.feed_forward(h)
+
+        with tf.name_scope("cost_function"):
+            self.loss = tf.reduce_mean(-tf.reduce_sum(self.labels * tf.log(self.output), axis=0))
 
     def train(self, data):
-        optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.001).minimize(self.loss)
+        with tf.name_scope("train"):
+            optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.001).minimize(self.loss)
+
         saver = tf.train.Saver()
+        merged_summary_op = tf.summary.merge_all()
+
         with tf.Session() as session:
             session.run(tf.global_variables_initializer())
             print('All variables Initialized')
+            summary_writer = tf.summary.FileWriter(config.OUT_DIR, session.graph)
 
             total_batch = int(data.size/config.BATCH_SIZE)
             for epoch in range(config.NUM_EPOCHS):
@@ -50,8 +59,12 @@ class MODEL():
                     _, loss_val = session.run([optimizer, self.loss], feed_dict=feed_dict)
                     print("batch:", batch, " loss: ", loss_val)
                     avg_cost += loss_val / total_batch
+
+#                summary_str = session.run([merged_summary_op], feed_dict=feed_dict)
+#                summary_writer.add_summary(summary_str, epoch)
                 print("Epoch:", (epoch + 1), "cost =", "{:.3f}".format(avg_cost))
 
+            summary_writer.close()
             save_path = saver.save(session, os.path.join(config.MODEL_DIR, "model" + str(config.BATCH_SIZE) + "_" + str(config.NUM_EPOCHS) + ".ckpt"))
             print("Model saved in path: %s" % save_path)
 
